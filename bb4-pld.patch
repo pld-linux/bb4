@@ -1,0 +1,144 @@
+diff -Nur bb4-1.8c1.orig/bb18c1/install/Makefile.pld bb4-1.8c1/bb18c1/install/Makefile.pld
+--- bb4-1.8c1.orig/bb18d/install/Makefile.pld	Thu Jan  1 01:00:00 1970
++++ bb4-1.8c1/bb18d/install/Makefile.pld	Wed Nov 14 13:41:21 2001
+@@ -0,0 +1,64 @@
++SHELL = /bin/sh
++MAKE = make
++CC = cc
++
++# FLAGS REQUIRED FOR PORTING
++# HPUX 10.0, irix and LINUX NEED NOTHING DEFINED
++# EXCEPT MAYBE THE OPTIMIZER
++# LIBS = -ll -lnsl -lsocket	# SOLARIS NEEDS THIS
++LIBS=
++
++# MISC COMPILER DIRECTIVES
++# -DENABLE_DISABLE      - INCLUDE CODE TO TEMPORARELY DISABLE NOTIFICATIONS ON A HOST
++# -DDATAMSG             - TO ALLOW data MESSAGES
++# -DNOTESMSG            - TO ALLOW notes MESSAGES
++# -DBZERO               - IF YOU DON'T HAVE bzero()
++# -DZOMBIE              - IF zombie PROCESSES ARE GENERATED
++# -DGETTIMEOFDAY        - TO GET DURATION STATISTICS
++# -DREGEXEC             - IF YOUR COMPILER SUPPORTS regexec(),regcomp()
++# -DREGEX               - IF YOUR COMPILER SUPPORTS regex(),regcmp()
++# -DRE_EXEC             - IF YOUR COMPILER SUPPORTS re_exec(),re_comp()
++# -DTIMEH               - IF YOUR OS HAS time.h INSTEAD OF sys/time.h
++# -DSIGSETJMP           - IF YOUR OS SUPPORTS sigsetjmp() AND
++#                               DOES NOT HANDLE SIGNALS PROPERLY
++#                               WITH setjmp()
++
++# Fixed confusing CFLAGS
++# thanks to Adam Goryachev <adam@wesolveit.com.au>
++# SOME OS NEEDS SPECIAL ZOMBIE HANDLING (-DZOMBIE)
++# SOME OS DON'T HAVE bzero() (-DBZERO)
++# SOME OS NEEDS SIGSETJMP HANDLING (-DSIGSETJMP)
++# REDHAT NEEDS -DSIGSETJMP
++
++OPTCFLAGS=-O2
++CFLAGS=$(OPTCFLAGS) -D&BBOSTYPE -DGETTIMEOFDAY -DSIGSETJMP -DREGEXEC -DTIMEH
++
++all: bb bbd bbnet touchtime dumphostsvc getipaddr bbstat
++
++bb: bb.o bbsend.o utils.o bb.h
++	${CC} ${CFLAGS} -o $@ bb.o bbsend.o utils.o ${LIBS}
++
++bbd: dohostsvc.o utils.o bbd.o bbpage.o bbsend.o bb.h
++	${CC} ${CFLAGS} -o $@ bbd.o dohostsvc.o bbpage.o bbsend.o utils.o ${LIBS}
++
++bbnet: bbnet.o utils.o bb.h
++	${CC} ${CFLAGS} -o $@ bbnet.o utils.o ${LIBS}
++
++touchtime: touchtime.o bb.h
++	${CC} ${CFLAGS} -o $@ touchtime.o ${LIBS}
++
++dumphostsvc: dohostsvc.o utils.o dumphostsvc.o bb.h
++	${CC} ${CFLAGS} -o $@ dumphostsvc.o dohostsvc.o utils.o ${LIBS}
++
++getipaddr: utils.o getipaddr.o bb.h
++	${CC} ${CFLAGS} -o $@ getipaddr.o utils.o ${LIBS}
++
++bbstat: bbstat.o bb.h
++	${CC} ${CFLAGS} -o $@ bbstat.o ${LIBS}
++
++install:
++	rm -f *.o
++	mv bb bbd bbnet touchtime dumphostsvc getipaddr bbstat ../bin
++
++clean:	
++	rm -f *.o bb bbd bbnet touchtime dumphostsvc getipaddr bbstat
+diff -Nur bb4-1.8c1.orig/bb18d/install/bbconfig bb4-1.8c1/bb18c1/install/bbconfig
+--- bb4-1.8c1.orig/bb18d/install/bbconfig	Tue Sep  4 05:59:41 2001
++++ bb4-1.8c1/bb18d/install/bbconfig	Wed Nov 14 13:44:23 2001
+@@ -117,6 +117,11 @@
+ in
+ 	linux )
+ 		# ARE WE A REDHAT MACHINE?
++		grep "PLD" /etc/issue >/dev/null
++		if test "$?" = "0"
++		then
++			MACHINE="pld"
++		fi
+ 		grep "Red" /etc/issue >/dev/null
+ 		if test "$?" = "0"
+ 		then
+@@ -185,7 +190,7 @@
+ 		;;
+ esac
+ 
+-OS="bsdi bsdi4 sco3 sco freebsd solaris hpux9 hpux linux sunos netbsd osf ultrix irix unixware unixware7 redhat aix dynix debian dgux openbsd caldera mandrake sinix suse darwin"
++OS="bsdi bsdi4 sco3 sco freebsd solaris hpux9 hpux linux sunos netbsd osf ultrix irix unixware unixware7 pld redhat aix dynix debian dgux openbsd caldera mandrake sinix suse darwin"
+ 
+ #--------------------------------------------------------
+ # SET UP BBHOME
+diff -Nur bb4-1.8c1.orig/bb18d/install/bbsys.pld bb4-1.8c1/bb18c1/install/bbsys.pld
+--- bb4-1.8c1.orig/bb18d/install/bbsys.pld	Thu Jan  1 01:00:00 1970
++++ bb4-1.8c1/bb18d/install/bbsys.pld	Wed Nov 14 14:07:28 2001
+@@ -0,0 +1,28 @@
++#
++# bbsys.pld  (Linux)
++#
++# BIG BROTHER
++# OPERATING SYSTEM DEPENDENT THINGS THAT ARE NEEDED
++#
++
++PS="/bin/ps axww"                        # 
++DF="/bin/df -k" 
++MSGFILE="/var/log/messages"
++PING="/usr/sbin/ping"
++SED="/bin/sed"
++MAIL="/bin/mail -s"
++GREP="/bin/grep"
++EGREP="/bin/egrep"
++LYNX="/usr/bin/lynx -dump -head"
++AWK="/bin/awk"
++PINGPAR1="-n -c1"		# ADDED BY ROB. DON'T RESOLVE NAME
++				# IF -n NOT THERE THAN NEW NETKIT (RH7) PING MAY FAIL
++#
++# From: Martin Richard <martin@europa.collegebdeb.qc.ca>
++# and others... took forever to make this change!
++# 
++TOUCH="/bin/touch"               # ADDED
++SORT="/bin/sort"                 # ADDED
++
++ID="/bin/id"
++
+--- bb4-1.8c1/bb18d/etc/bbdef.sh.DIST.orig	Wed Oct  3 21:07:49 2001
++++ bb4-1.8c1/bb18d/etc/bbdef.sh.DIST	Thu Nov 29 12:30:14 2001
+@@ -73,7 +73,7 @@
+ #
+ # LOCATION OF BBOUT FILE
+ #
+-BBOUT="$BBHOME/BBOUT"
++BBOUT="$BBTMP/BBOUT"
+ export BBOUT
+ 
+ #
+@@ -308,7 +308,7 @@
+ #
+ # What NET services to check (don't put in dns/dig/http)
+ #
+-BBNETSVCS="smtp telnet ftp pop pop3 pop-3 ssh imap ssh1 ssh2 imap2 imap3 imap4 pop2 pop-2 nntp"
++BBNETSVCS="smtp telnet ftp pop pop3 pop-3 ssh imap ssh1 ssh2 imap2 imap3 imap4 pop2 pop-2 nntp smtps pop3s imaps nntps"
+ export BBNETSVCS
+ 
+ #
