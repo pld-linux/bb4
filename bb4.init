@@ -34,15 +34,10 @@ case "$1" in
 		msg_starting bb
 		su - bb -c '/usr/bin/setsid /usr/lib/bb/runbb.sh start' </dev/null >/dev/null 2>&1
 		RETVAL=$?
-		if [ "$RETVAL" = "0" ]; then
-			ok
-		else
-			fail
-		fi
+		[ $RETVAL -eq 0 ] && ok || fail
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/bb
 	else
 		msg_already_running bb
-		exit 1
 	fi
 	;;
   stop)
@@ -50,26 +45,22 @@ case "$1" in
 	if [ -f /var/lock/subsys/bb ]; then
 		msg_stopping bb
 		su - bb -c '/usr/lib/bb/runbb.sh stop' >/dev/null 2>&1
-		if [ "$?" = "0" ]; then
-			ok
-		else
-			fail
-		fi
+		[ $? -eq 0 ] && ok || died
 		rm -f /var/lock/subsys/bb >/dev/null 2>&1
 	else
 		msg_not_running bb
-		exit 1
 	fi
 	;;
   status)
 	;;
-  restart|reload)
+  restart|force-reload)
 	$0 stop
 	$0 start
+	exit $?
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|reload|status}"
-	exit 1
+	msg_usage "$0 {start|stop|restart|force-reload|status}"
+	exit 3
 	;;
 esac
 
