@@ -18,7 +18,7 @@
 # Check that networking is up.
 if is_no "${NETWORKING}"; then
         # nls "ERROR: Networking is down. %s can't be run." <service>
-        msg_Network_Down httpd
+        msg_network_down bb
         exit 1
 fi
 
@@ -37,7 +37,7 @@ case "$1" in
 		fi
     		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/bb
 	else
-        	msg_Already_Running bb
+        	msg_already_running bb
 	        exit 1
 	fi
 	;;
@@ -53,7 +53,7 @@ case "$1" in
 		fi
                 rm -f /var/lock/subsys/bb >/dev/null 2>&1
         else
-		msg_Not_Running bb
+		msg_not_running bb
 	        exit 1
 	fi
 	;;
@@ -62,7 +62,7 @@ case "$1" in
 	$0 start
 	;;
   *)
-	msg_Usage "$0 {start|stop|restart}"
+	msg_usage "$0 {start|stop|restart}"
 	exit 1
 	;;
 esac
