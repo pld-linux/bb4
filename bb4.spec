@@ -6,7 +6,7 @@ Version:	1.8d
 Release:	2
 License:	Free for non-commercial use, 30-day trial for commercial use; not distributable
 Group:		Networking
-Source0:	http://bb4.com/dnld/bb-%{version}.tar.gz
+Source0:	bb-%{version}.tar.gz
 Source1:	%{name}.init
 Patch0:		%{name}-pld.patch
 NoSource:	0
