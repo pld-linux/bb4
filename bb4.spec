@@ -6,10 +6,6 @@ Version:	1.8d
 Release:	1
 License:	free for non commercial use, 30-day trial for commercial use; not distributable
 Group:		Networking
-Group(de):	Netzwerkwesen
-Group(es):	Red
-Group(pl):	Sieciowe
-Group(pt_BR):	Rede
 Source0:	http://bb4.com/dnld/bb-%{version}.tar.gz
 Source1:	%{name}.init
 Patch0:		%{name}-pld.patch
