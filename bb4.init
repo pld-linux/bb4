@@ -2,7 +2,7 @@
 #
 # bb		Big Brother System and Network Monitor
 #
-# chkconfig:	345 99 01
+# chkconfig:	345 95 01
 # description:	Big Brother is System and Network Monitoring system
 # processname:	bbd
 
