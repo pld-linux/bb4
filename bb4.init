@@ -16,45 +16,49 @@
 [ -f /etc/sysconfig/bb ] && . /etc/sysconfig/bb
 
 # Check that networking is up.
-if is_no "${NETWORKING}"; then
-        # nls "ERROR: Networking is down. %s can't be run." <service>
-        msg_network_down bb
-        exit 1
+if is_yes "${NETWORKING}"; then
+	if [ ! -f /var/lock/subsys/network ]; then
+		# nls "ERROR: Networking is down. %s can't be run." <service>
+		msg_network_down bb
+		exit 1
+	fi
+else
+	exit 0
 fi
 
 # See how we were called.
 case "$1" in
   start)
 	# Check if the service is already running?
-        if [ ! -f /var/lock/subsys/bb ]; then
+	if [ ! -f /var/lock/subsys/bb ]; then
 		msg_starting bb
 		su - bb -c '/usr/bin/setsid /usr/lib/bb/runbb.sh start' </dev/null >/dev/null 2>&1
-	        RETVAL=$?
+		RETVAL=$?
 		if [ "$RETVAL" = "0" ]; then
 			ok
 		else
 			fail
 		fi
-    		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/bb
+		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/bb
 	else
-        	msg_already_running bb
-	        exit 1
+		msg_already_running bb
+		exit 1
 	fi
 	;;
   stop)
-        # Stop daemons.
+	# Stop daemons.
 	if [ -f /var/lock/subsys/bb ]; then
-                msg_stopping bb
+		msg_stopping bb
 		su - bb -c '/usr/lib/bb/runbb.sh stop' >/dev/null 2>&1
 		if [ "$?" = "0" ]; then
 			ok
 		else
 			fail
 		fi
-                rm -f /var/lock/subsys/bb >/dev/null 2>&1
-        else
+		rm -f /var/lock/subsys/bb >/dev/null 2>&1
+	else
 		msg_not_running bb
-	        exit 1
+		exit 1
 	fi
 	;;
   status)
