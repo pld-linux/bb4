@@ -20,6 +20,7 @@ Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
 Requires:	/usr/bin/setsid
+Conflicts:	iputils-ping < 1:ss020124
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_etcdir		/etc/bb

@@ -104,7 +104,7 @@ diff -Nur bb4-1.8c1.orig/bb18d/install/bbsys.pld bb4-1.8c1/bb18c1/install/bbsys.
 +PS="/bin/ps axww"                        # 
 +DF="/bin/df -k" 
 +MSGFILE="/var/log/messages"
-+PING="/usr/sbin/ping"
++PING="/bin/ping"
 +SED="/bin/sed"
 +MAIL="/bin/mail -s"
 +GREP="/bin/grep"
