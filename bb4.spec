@@ -11,6 +11,7 @@ Source1:	%{name}.init
 Patch0:		%{name}-pld.patch
 NoSource:	0
 URL:		http://bb4.com/
+BuildRequires:	rpmbuild(macros) >= 1.159
 PreReq:		rc-scripts
 Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
@@ -20,6 +21,8 @@ Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
 Requires(post,preun):	/sbin/chkconfig
 Requires:	/usr/bin/setsid
+Provides:	group(bb)
+Provides:	user(bb)
 Conflicts:	iputils-ping < 1:ss020124
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -124,15 +127,16 @@ if [ -n "`/usr/bin/getgid bb`" ]; then
 		exit 1
 	fi
 else
-	/usr/sbin/groupadd -g 73 -r -f bb
+	/usr/sbin/groupadd -g 73 bb
 fi
 if [ -n "`/bin/id -u bb 2>/dev/null`" ]; then
-	if [ "`/bin/id -u bb`" != "73" ]; then
+	if [ "`/bin/id -u bb`" != 73 ]; then
 		echo "Error: user bb doesn't have uid=73. Correct this before installing BB." 1>&2
 		exit 1
 	fi
 else
-	/usr/sbin/useradd -u 73 -r -d %{_vardir} -s /bin/sh -c "Big Brother" -g bb -G root,proc,adm bb 1>&2
+	/usr/sbin/useradd -u 73 -d %{_vardir} -s /bin/sh -c "Big Brother" \
+		-g bb -G root,proc,adm bb 1>&2
 fi
 
 %post
@@ -153,8 +157,8 @@ fi
 
 %postun
 if [ "$1" = "0" ]; then
-	/usr/sbin/userdel bb
-	/usr/sbin/groupdel bb
+	%userremove bb
+	%groupremove bb
 fi
 
 %files
