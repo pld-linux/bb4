@@ -3,7 +3,7 @@ Summary(pl):	Wielki Brat - monitor systemów i sieci
 Name:		bb4
 Version:	1.8d
 %define	nshort	bb18d
-Release:	1
+Release:	2
 License:	free for non commercial use, 30-day trial for commercial use; not distributable
 Group:		Networking
 Source0:	http://bb4.com/dnld/bb-%{version}.tar.gz
