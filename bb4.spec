@@ -11,14 +11,14 @@ Source1:	%{name}.init
 Patch0:		%{name}-pld.patch
 NoSource:	0
 URL:		http://bb4.com/
-Prereq:		/usr/sbin/groupadd
-Prereq:		/usr/sbin/useradd
-Prereq:		/usr/sbin/groupdel
-Prereq:		/usr/sbin/userdel
-Prereq:		/bin/id
-Prereq:		/usr/bin/getgid
-Prereq:		/sbin/chkconfig
-Prereq:		rc-scripts
+PreReq:		rc-scripts
+Requires(pre):	/bin/id
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/useradd
+Requires(post,preun):	/sbin/chkconfig
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
 Requires:	/usr/bin/setsid
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -113,28 +113,25 @@ install %{nshort}/etc/{bbdef.sh,bbinc.sh,bbsys.local,bbsys.sh,bbwarnrules.cfg,bb
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/bb
 
-cd %{nshort}
-gzip -9nf LICENSE README README.CHANGES README.SECURITY README.SUPPORT
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %pre
 if [ -n "`/usr/bin/getgid bb`" ]; then
 	if [ "`/usr/bin/getgid bb`" != "73" ]; then
-		echo "Warning: group bb haven't gid=73. Correct this before installing bb" 1>&2
+		echo "Error: group bb doesn't have gid=73. Correct this before installing BB." 1>&2
                 exit 1
         fi
 else
         /usr/sbin/groupadd -g 73 -r -f bb
 fi
 if [ -n "`/bin/id -u bb 2>/dev/null`" ]; then
-        if [ "`/bin/id -u bb`" != "73" ]; then
-                echo "Warning: user bb haven't uid=73. Correct this before installing bb" 1>&2
-                exit 1
-        fi
+	if [ "`/bin/id -u bb`" != "73" ]; then
+		echo "Error: user bb doesn't have uid=73. Correct this before installing BB." 1>&2
+		exit 1
+	fi
 else
-        /usr/sbin/useradd -u 73 -r -d %{_vardir} -s /bin/sh -c "Big Brother" -g bb -G root,proc,adm bb 1>&2
+	/usr/sbin/useradd -u 73 -r -d %{_vardir} -s /bin/sh -c "Big Brother" -g bb -G root,proc,adm bb 1>&2
 fi
 
 %post
@@ -161,7 +158,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc %{nshort}/*.gz
+%doc %{nshort}/{LICENSE,README,README.CHANGES,README.SECURITY,README.SUPPORT}
 %dir %{_etcdir}
 %config(noreplace) %verify(not size mtime md5) %{_etcdir}/*
 %attr(755,root,root) %{_cgidir}/*
