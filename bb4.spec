@@ -25,8 +25,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_etcdir		/etc/bb
 %define		_libdir		/usr/lib/bb
-%define		_htmldir	/home/httpd/html/bb
-%define		_cgidir		/home/httpd/cgi-bin
+%define		_htmldir	/home/services/httpd/html/bb
+%define		_cgidir		/home/services/httpd/cgi-bin
 %define		_vardir		/var/lib/bb
 %define		_sysconfdir	/etc/dummy
 
