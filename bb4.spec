@@ -12,7 +12,12 @@ Patch0:		%{name}-pld.patch
 NoSource:	0
 URL:		http://bb4.com/
 PreReq:		rc-scripts
-Requires(pre):	user-bb
+Requires(pre): /bin/id
+Requires(pre): /usr/bin/getgid
+Requires(pre): /usr/sbin/groupadd
+Requires(pre): /usr/sbin/useradd
+Requires(postun):      /usr/sbin/groupdel
+Requires(postun):      /usr/sbin/userdel
 Requires(post,preun):	/sbin/chkconfig
 Requires:	/usr/bin/setsid
 Conflicts:	iputils-ping < 1:ss020124
@@ -112,6 +117,24 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/bb
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%pre
+if [ -n "`/usr/bin/getgid bb`" ]; then
+       if [ "`/usr/bin/getgid bb`" != "73" ]; then
+               echo "Error: group bb doesn't have gid=73. Correct this before installing BB." 1>&2
+                exit 1
+        fi
+else
+        /usr/sbin/groupadd -g 73 -r -f bb
+fi
+if [ -n "`/bin/id -u bb 2>/dev/null`" ]; then
+       if [ "`/bin/id -u bb`" != "73" ]; then
+               echo "Error: user bb doesn't have uid=73. Correct this before installing BB." 1>&2
+               exit 1
+       fi
+else
+       /usr/sbin/useradd -u 73 -r -d %{_vardir} -s /bin/sh -c "Big Brother" -g bb -G root,proc,adm bb 1>&2
+fi
+
 %post
 /sbin/chkconfig --add bb
 if [ -f /var/lock/subsys/bb ]; then
@@ -126,6 +149,12 @@ if [ "$1" = "0" ]; then
 		 /etc/rc.d/init.d/bb stop >&2
 	fi
 	/sbin/chkconfig --del bb
+fi
+
+%postun
+if [ "$1" = "0" ]; then
+       /usr/sbin/userdel bb
+       /usr/sbin/groupdel bb
 fi
 
 %files
