@@ -11,7 +11,7 @@ Source1:	%{name}.init
 Patch0:		%{name}-pld.patch
 NoSource:	0
 URL:		http://bb4.com/
-BuildRequires:	rpmbuild(macros) >= 1.159
+BuildRequires:	rpmbuild(macros) >= 1.202
 PreReq:		rc-scripts
 Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
@@ -121,23 +121,8 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/bb
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-if [ -n "`/usr/bin/getgid bb`" ]; then
-	if [ "`/usr/bin/getgid bb`" != "73" ]; then
-		echo "Error: group bb doesn't have gid=73. Correct this before installing BB." 1>&2
-		exit 1
-	fi
-else
-	/usr/sbin/groupadd -g 73 bb
-fi
-if [ -n "`/bin/id -u bb 2>/dev/null`" ]; then
-	if [ "`/bin/id -u bb`" != 73 ]; then
-		echo "Error: user bb doesn't have uid=73. Correct this before installing BB." 1>&2
-		exit 1
-	fi
-else
-	/usr/sbin/useradd -u 73 -d %{_vardir} -s /bin/sh -c "Big Brother" \
-		-g bb -G root,proc,adm bb 1>&2
-fi
+%groupadd -g 73 bb
+%useradd -u 73 -d %{_vardir} -s /bin/sh -c "Big Brother" -g bb -G root,proc,adm bb
 
 %post
 /sbin/chkconfig --add bb
