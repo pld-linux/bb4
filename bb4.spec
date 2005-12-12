@@ -12,14 +12,14 @@ Patch0:		%{name}-pld.patch
 NoSource:	0
 URL:		http://bb4.com/
 BuildRequires:	rpmbuild(macros) >= 1.202
-PreReq:		rc-scripts
+Requires:	rc-scripts
+Requires(post,preun):	/sbin/chkconfig
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
-Requires(postun):	/usr/sbin/groupdel
-Requires(postun):	/usr/sbin/userdel
-Requires(post,preun):	/sbin/chkconfig
 Requires:	/usr/bin/setsid
 Provides:	group(bb)
 Provides:	user(bb)
@@ -150,7 +150,7 @@ fi
 %defattr(644,root,root,755)
 %doc %{nshort}/{LICENSE,README,README.CHANGES,README.SECURITY,README.SUPPORT}
 %dir %{_etcdir}
-%config(noreplace) %verify(not size mtime md5) %{_etcdir}/*
+%config(noreplace) %verify(not md5 mtime size) %{_etcdir}/*
 %attr(755,root,root) %{_cgidir}/*
 %dir %{_libdir}
 %attr(755,root,root) %{_libdir}/bin
