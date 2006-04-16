@@ -1,8 +1,8 @@
+%define	nshort	bb18d
 Summary:	Big Brother System and Network Monitor
 Summary(pl):	Wielki Brat - monitor systemów i sieci
 Name:		bb4
 Version:	1.8d
-%define	nshort	bb18d
 Release:	2
 License:	Free for non-commercial use, 30-day trial for commercial use; not distributable
 Group:		Networking
@@ -11,8 +11,7 @@ Source1:	%{name}.init
 Patch0:		%{name}-pld.patch
 NoSource:	0
 URL:		http://bb4.com/
-BuildRequires:	rpmbuild(macros) >= 1.202
-Requires:	rc-scripts
+BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
@@ -21,6 +20,7 @@ Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires:	/usr/bin/setsid
+Requires:	rc-scripts
 Provides:	group(bb)
 Provides:	user(bb)
 Conflicts:	iputils-ping < 1:ss020124
@@ -105,7 +105,7 @@ ln -sf bb.html $RPM_BUILD_ROOT%{_htmldir}/index.html
 ln -sf %{_etcdir} $RPM_BUILD_ROOT%{_libdir}/etc
 ln -sf %{_htmldir} $RPM_BUILD_ROOT%{_libdir}/www
 ln -sf %{_vardir}/tmp $RPM_BUILD_ROOT%{_libdir}/tmp
-ln -sf %{_vardir} $RPM_BUILD_ROOT/usr/lib/bbvar
+ln -sf %{_vardir} $RPM_BUILD_ROOT%{_prefix}/lib/bbvar
 
 for f in bb-bbexttab bb-cputab bb-dftab bb-msgstab bb-proctab security ; do
 	sed -e 's/^[^#]/#\&/' %{nshort}/etc/$f.DIST > $RPM_BUILD_ROOT%{_etcdir}/$f
@@ -126,17 +126,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add bb
-if [ -f /var/lock/subsys/bb ]; then
-	/etc/rc.d/init.d/bb restart >&2
-else
-	echo "Run \"/etc/rc.d/init.d/bb start\" to start Big Brother daemon." >&2
-fi
+%service bb restart "Big Brother daemon"
 
 %preun
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/bb ]; then
-		 /etc/rc.d/init.d/bb stop >&2
-	fi
+	%service bb stop
 	/sbin/chkconfig --del bb
 fi
 
@@ -163,7 +157,7 @@ fi
 %{_libdir}/www
 %{_libdir}/tmp
 %attr(755,root,root) %{_libdir}/runbb.sh
-/usr/lib/bbvar
+%{_prefix}/lib/bbvar
 %attr(775,root,bb) %dir %{_htmldir}
 %attr(775,root,bb) %{_htmldir}/html
 %{_htmldir}/gifs*
