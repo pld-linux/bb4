@@ -150,7 +150,7 @@ fi
 %attr(755,root,root) %{_libdir}/bin
 %{_libdir}/etc
 %attr(755,root,root) %{_libdir}/ext
-%dir %attr(755,root,root) %{_libdir}/web
+%dir %{_libdir}/web
 %{_libdir}/web/*_*er
 %attr(755,root,root) %{_libdir}/web/bb-*
 %attr(755,root,root) %{_libdir}/web/mk*
