@@ -42,7 +42,7 @@ Wielki Brat - monitor systemów i sieci.
 %prep
 %setup -q -c
 tar xf %{nshort}.tar
-%patch -p1
+%patch0 -p1
 
 %build
 cd %{nshort}
