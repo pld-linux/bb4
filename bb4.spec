@@ -1,7 +1,7 @@
 # TODO: webapps
 %define	nshort	bb18d
 Summary:	Big Brother System and Network Monitor
-Summary(pl):	Wielki Brat - monitor systemów i sieci
+Summary(pl.UTF-8):   Wielki Brat - monitor systemÃ³w i sieci
 Name:		bb4
 Version:	1.8d
 Release:	2
@@ -37,8 +37,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 Big Brother - network monitoring system.
 
-%description -l pl
-Wielki Brat - monitor systemów i sieci.
+%description -l pl.UTF-8
+Wielki Brat - monitor systemÃ³w i sieci.
 
 %prep
 %setup -q -c
