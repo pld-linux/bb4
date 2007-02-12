@@ -1,7 +1,7 @@
 # TODO: webapps
 %define	nshort	bb18d
 Summary:	Big Brother System and Network Monitor
-Summary(pl.UTF-8):   Wielki Brat - monitor systemów i sieci
+Summary(pl.UTF-8):	Wielki Brat - monitor systemów i sieci
 Name:		bb4
 Version:	1.8d
 Release:	2
